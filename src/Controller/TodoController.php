@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/api/todo", name="todo.")
@@ -15,8 +17,15 @@ class TodoController extends AbstractController
      * @Route("/", name="getTodo")
      * @return Response
      */
-    public function getTodos(): Response
+    public function getTodos(EntityManagerInterface $entityManager): Response
     {
+        // $user = new User();
+        // $user->setEmail("a@a.pl");
+        // $user->setPassword("123");
+
+        // $entityManager->persist($user);
+        // $entityManager->flush();
+
         $response = new Response();
 
         $response->headers->set('Content-Type', 'application/json');
