@@ -2,30 +2,46 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 
 class RegistrationController extends AbstractController
 {
+    private $entityManager;
+    private $encoder;
+
+    public function __construct(EntityManagerInterface $entityManager, UserPasswordEncoderInterface $encoder){
+        $this->entityManager = $entityManager;
+        $this->encoder = $encoder;
+    }
     /**
      * @Route("/api/register", name="register", methods={"POST"})
      */
-    public function register(Request $request, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, UserRepository $repository): Response
     {
         $content = json_decode($request->getContent(), true);
-        dump($content["username"]);
-        // $user = new User();
-        // $user->setEmail("a@a.pl");
-        // $user->setPassword("123");
-
-        // $entityManager->persist($user);
-        // $entityManager->flush();
+        $userFound = $repository->findOneByEmail($content["username"]);
 
         $response = new Response();
+
+        if($userFound !== null){
+            $response->setStatusCode(Response::HTTP_CONFLICT);
+            return $response;
+        }
+        
+        $user = new User();
+        $user->setEmail($content["username"]);
+        $user->setPassword($encoder->encodePassword($user, $content["password"]));
+
+        $entityManager->persist($user);
+        $entityManager->flush();
 
         $response->setStatusCode(Response::HTTP_CREATED);
 
