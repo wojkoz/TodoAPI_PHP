@@ -14,17 +14,17 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class RegistrationController extends AbstractController
 {
-    private $entityManager;
-    private $encoder;
 
-    public function __construct(EntityManagerInterface $entityManager, UserPasswordEncoderInterface $encoder){
-        $this->entityManager = $entityManager;
-        $this->encoder = $encoder;
+    public function __construct(){
+
     }
     /**
      * @Route("/api/register", name="register", methods={"POST"})
      */
-    public function register(Request $request, UserRepository $repository): Response
+    public function register(Request $request,
+                                UserRepository $repository,
+                                EntityManagerInterface $entityManager,
+                                UserPasswordEncoderInterface $encoder): Response
     {
         $content = json_decode($request->getContent(), true);
         $userFound = $repository->findOneByEmail($content["username"]);
