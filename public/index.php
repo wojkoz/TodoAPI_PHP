@@ -27,6 +27,17 @@ if ($method == "OPTIONS") {
 
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
+// $headers = apache_request_headers();
+
+// foreach ($headers as $header => $value) {
+//     if($header === "Authorization"){
+//         $_SERVER["Authorization"] = $value;
+//         echo "$header: $value <br />\n";
+//     }
+    
+// }
+
+
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);

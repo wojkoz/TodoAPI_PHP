@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Dto\TodoDto;
 use App\Entity\Todo;
 use App\Entity\User;
+use App\Repository\TodoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,15 +20,10 @@ class TodoController extends AbstractController
      * @Route("/{userId}", name="getTodo")
      * @return Response
      */
-    public function getTodos(EntityManagerInterface $entityManager, $userId): Response
+    public function getTodos(TodoRepository $repository, $userId): Response
     {
-        $user = $entityManager->find("User", $userId);
-        $response = new Response();
-
-        if($user === null){
-            $response->setStatusCode(Response::HTTP_NO_CONTENT, "Couldn't find user");
-            return $response;
-        }
+        $todos = $repository->findByUserId($userId);
+        
 
         $toTodoDto = function(Todo $todo){
             $dto = new TodoDto();
@@ -40,9 +36,8 @@ class TodoController extends AbstractController
             return $dto;
         };
         
-        $todoDtoList = array_map($toTodoDto, $user->getTodos());
-        dump($todoDtoList);
-
+        $todoDtoList = array_map($toTodoDto, $todos);
+        $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
 

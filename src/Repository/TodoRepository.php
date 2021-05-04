@@ -19,6 +19,17 @@ class TodoRepository extends ServiceEntityRepository
         parent::__construct($registry, Todo::class);
     }
 
+    public function findByUserId($value)
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.userId = :val')
+            ->setParameter('val', $value)
+            ->orderBy('t.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Todo[] Returns an array of Todo objects
     //  */

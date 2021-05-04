@@ -1,3 +1,15 @@
-RewriteEngine On
-RewriteCond %{HTTP:Authorization} ^(.*)
-RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+<VirtualHost *:80>
+    ServerName todo.pl
+    ServerAlias www.todo.pl
+
+    DocumentRoot ./
+    <Directory ./>
+        AllowOverride All
+        Order Allow,Deny
+        Allow from All
+    </Directory>
+
+    ErrorLog /var/log/apache2/project_error.log
+    CustomLog /var/log/apache2/project_access.log combined
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</VirtualHost>
