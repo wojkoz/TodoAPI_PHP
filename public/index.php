@@ -15,29 +15,8 @@ if ($_SERVER['APP_DEBUG']) {
     Debug::enable();
 }
 
-header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Headers: X-API-KEY, Authorization, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-header("Allow: GET, POST, OPTIONS, PUT, DELETE");
-$method = $_SERVER['REQUEST_METHOD'];
-if ($method == "OPTIONS") {
-    die();
-}
-
-
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
-// $headers = apache_request_headers();
-
-// foreach ($headers as $header => $value) {
-//     if($header === "Authorization"){
-//         $_SERVER["Authorization"] = $value;
-//         echo "$header: $value <br />\n";
-//     }
-    
-// }
-
-
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
