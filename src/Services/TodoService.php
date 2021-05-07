@@ -50,14 +50,7 @@ class TodoService implements ITodoService{
         $this->em->persist($todo);
         $this->em->flush();
 
-        $savedTodo = $this->todoRepository->findOneBy(
-            array(
-                "title" => $requestContent["title"],
-                "description" => $requestContent["description"],
-                "userId" => $requestContent["userId"]),
-            array("id" => "DESC")
-        );
-        $dto = $this->mapToTodoDto($savedTodo);
+        $dto = $this->mapToTodoDto($todo);
 
         return $dto;
     }

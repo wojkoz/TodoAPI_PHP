@@ -4,15 +4,18 @@ namespace App\Controller;
 
 use App\Dto\TodoDto;
 use App\Services\ITodoService;
+use App\Form\Type\TodoCreateType;
+use App\Controller\AbstractApiController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+//TODO: fix routes /api/user/{userId}/todo instead of /api/todo/{userId} 
 
 /**
  * @Route("/api/todo", name="todo.")
  */
-class TodoController extends AbstractController
+class TodoController extends AbstractApiController
 {
     private ITodoService $service;
 
@@ -27,14 +30,8 @@ class TodoController extends AbstractController
     public function getTodos($userId): Response
     {
         $todoDtoList = $this->service->getTodosByUserId($userId);
-        
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', '*');
 
-        $response->setContent(json_encode($todoDtoList));
-
-        return $response;
+        return $this->respond($todoDtoList);
     }
 
     /**
@@ -42,15 +39,24 @@ class TodoController extends AbstractController
      *
      */
     public function addTodo(Request $request){
+
+        $form = $this->buildForm(TodoCreateType::class);
+        $form->handleRequest($request);
+
+        if(!$form->isSubmitted() || !$form->isValid()){
+            dump($form->getData());
+            return $this->respond($form, Response::HTTP_BAD_REQUEST);
+        }
+
         $content = json_decode($request->getContent(), true);
         
         $dto = $this->service->addTodo($content);
 
         if($dto === null){
-            return new Response("Couldn't find user", Response::HTTP_NOT_FOUND);
+            return $this->respond("Couldn't find user", Response::HTTP_NOT_FOUND);
         }
 
-        return new Response(json_encode($dto, Response::HTTP_CREATED));
+        return $this->respond($dto, Response::HTTP_CREATED);
 
     }
 
@@ -65,6 +71,6 @@ class TodoController extends AbstractController
            return new Response("", Response::HTTP_NOT_FOUND);
        }
 
-        return new Response(json_encode($dto, Response::HTTP_CREATED));
+        return $this->respond($dto);
     }
 }
