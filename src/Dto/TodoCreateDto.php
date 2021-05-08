@@ -5,8 +5,7 @@ namespace App\Dto;
 class TodoCreateDto{
     
     public string $title;
-    public string $description;
-    public int $userId;
+    public ?string $description = "";
 
     public function __construct(){
 

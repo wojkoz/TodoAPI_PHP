@@ -57,10 +57,10 @@ class TodoController extends AbstractApiController
      *
      */
     public function deleteTodo(int $todoId, int $userId){
-       $dto = $this->service->deleteTodo($todoId);
+       $dto = $this->service->deleteTodo($todoId, $userId);
 
        if($dto === null){
-           return new Response("", Response::HTTP_NOT_FOUND);
+           return new Response("Todo not found", Response::HTTP_NOT_FOUND);
        }
 
         return $this->respond($dto);

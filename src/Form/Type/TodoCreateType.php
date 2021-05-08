@@ -25,15 +25,9 @@ class TodoCreateType extends AbstractType{
             ])
             ->add('description', TextType::class, [
                 'constraints' => [
-                    new NotNull(),
                     new Length([
                         'max' => 200
                     ])
-                ]
-            ])
-            ->add('userId', IntegerType::class, [
-                'constraints' => [
-                    new NotNull()
                 ]
             ]);
     }
