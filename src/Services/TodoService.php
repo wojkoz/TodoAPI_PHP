@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 namespace App\Services;
 
 use App\Dto\TodoDto;
 use App\Entity\Todo;
+use App\Dto\TodoCreateDto;
 use App\Services\ITodoService;
 use App\Repository\TodoRepository;
 use App\Repository\UserRepository;
@@ -22,7 +24,7 @@ class TodoService implements ITodoService{
         $this->em = $em;
     }
 
-    public function getTodosByUserId($userId): array{
+    public function getTodosByUserId(int $userId): array{
         $todos = $this->todoRepository->findByUserId($userId);
         
 
@@ -34,8 +36,8 @@ class TodoService implements ITodoService{
     }
 
     
-    public function addTodo($requestContent) : ?TodoDto{
-        $userFound = $this->userRepository->find($requestContent["userId"]);
+    public function addTodo(TodoCreateDto $todoCreateDto, int $userId) : ?TodoDto{
+        $userFound = $this->userRepository->find($userId);
 
         if($userFound === null){
             return null;
@@ -43,8 +45,8 @@ class TodoService implements ITodoService{
 
         $todo = new Todo();
         $todo
-            ->setTitle($requestContent["title"])
-            ->setDescription($requestContent["description"]);
+            ->setTitle($todoCreateDto->title)
+            ->setDescription($todoCreateDto->description);
         $userFound->addTodo($todo);
 
         $this->em->persist($todo);
@@ -55,8 +57,9 @@ class TodoService implements ITodoService{
         return $dto;
     }
     
-    public function deleteTodo($todoId) : ?TodoDto{
-        $todo = $this->todoRepository->findOneBy(array("id" => $todoId));
+    public function deleteTodo(int $todoId, int $userId) : ?TodoDto{
+        $todo = $this->todoRepository->findOneBy(array("id" => $todoId, "userId" => $userId));
+        
         if($todo === null){
             return null;
         }

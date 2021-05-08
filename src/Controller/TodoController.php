@@ -10,11 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-//TODO: fix routes /api/user/{userId}/todo instead of /api/todo/{userId} 
-
-/**
- * @Route("/api/todo", name="todo.")
- */
 class TodoController extends AbstractApiController
 {
     private ITodoService $service;
@@ -24,7 +19,7 @@ class TodoController extends AbstractApiController
     }
 
     /**
-     * @Route("/{userId}", name="getTodo", methods={"GET"})
+     * @Route("/api/user/{userId}/todo", name="getTodos", methods={"GET"})
      * @return Response
      */
     public function getTodos($userId): Response
@@ -35,22 +30,19 @@ class TodoController extends AbstractApiController
     }
 
     /**
-     * @Route("", name="addTodo", methods={"POST"})
+     * @Route("/api/user/{userId}/todo", name="addTodo", methods={"POST"})
      *
      */
-    public function addTodo(Request $request){
+    public function addTodo(Request $request, int $userId){
 
         $form = $this->buildForm(TodoCreateType::class);
         $form->handleRequest($request);
 
         if(!$form->isSubmitted() || !$form->isValid()){
-            dump($form->getData());
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
-
-        $content = json_decode($request->getContent(), true);
         
-        $dto = $this->service->addTodo($content);
+        $dto = $this->service->addTodo($form->getData(), $userId);
 
         if($dto === null){
             return $this->respond("Couldn't find user", Response::HTTP_NOT_FOUND);
@@ -61,10 +53,10 @@ class TodoController extends AbstractApiController
     }
 
     /**
-     * @Route("/{todoId}", name="deleteTodo", methods={"DELETE"})
+     * @Route("/api/user/{userId}/todo/{todoId}", name="deleteTodo", methods={"DELETE"})
      *
      */
-    public function deleteTodo($todoId){
+    public function deleteTodo(int $todoId, int $userId){
        $dto = $this->service->deleteTodo($todoId);
 
        if($dto === null){
